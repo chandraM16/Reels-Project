@@ -1,0 +1,41 @@
+.loginCard {
+  /* border: 3px solid red; */
+  margin-top: 5rem;
+  width: 26rem;
+}
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.logo-cont {
+  display: flex;
+  justify-content: center;
+}
+
+.logo-img {
+  /* border: 3px solid red; */
+  width: 15rem;
+  height: 8rem;
+}
+
+.subtitle {
+  color: gray;
+  text-align: center;
+}
+
+.css-x4wfr5-MuiTypography-root {
+  text-align: center;
+}
+.login-btn-cont {
+  /* border: 3px solid black; */
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.login-btn {
+  border: 3px solid red;
+}
+
