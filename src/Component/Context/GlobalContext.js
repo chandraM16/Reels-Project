@@ -15,7 +15,7 @@ export const GlobalContext = (props) => {
     setIsLoading,
   };
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <ContextState.Provider value={value}>

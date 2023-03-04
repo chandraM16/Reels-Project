@@ -7,7 +7,8 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Divider } from "@mui/material";
 
 // import { makeStyles } from '@mui/styles';
 import "../Signup/signup.css";
@@ -17,15 +18,20 @@ import { async } from "@firebase/util";
 
 export default function Signup() {
   const [userInput, setUserInput] = useState({
+    userName: "",
     email: "",
     password: "",
     cPassword: "",
   });
   const [isOk, setIsOk] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const { signUpUserWithEmailAndPassword, createUserInDatabase } =
-    useFirebase();
+  const {
+    signUpUserWithEmailAndPassword,
+    createUserInDatabase,
+    signUpWithGoogle,
+  } = useFirebase();
   // console.log(signUpUserWithEmailAndPassword);
 
   async function handleSignUpClick() {
@@ -49,11 +55,16 @@ export default function Signup() {
 
       setIsOk("Successfully Sign Up");
       setError("");
-      createUserInDatabase({
-        email: response.user.email,
-        id: response.user.uid,
-        password: userInput.password,
-      });
+      putDataInDataBase(
+        userInput.userName,
+        userObj.email,
+        userObj.uid,
+        userInput.password,
+        userObj.metadata.createdAt
+      );
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (error) {
       console.log(error);
       setIsOk("");
@@ -63,6 +74,36 @@ export default function Signup() {
       }, 3000);
     } finally {
     }
+  }
+
+  async function handleSignUpWithGoggle() {
+    const response = await signUpWithGoogle();
+    console.log(response);
+    setIsOk("Successfully Sign Up");
+    setError("");
+    putDataInDataBase(
+      response.user.displayName,
+      response.user.email,
+      response.user.uid,
+      "googleSignIn",
+      response.user.metadata.createdAt
+    );
+
+    setTimeout(() => {
+      navigate("/");
+    }, 3000);
+  }
+
+  function putDataInDataBase(userName, email, id, password, createdAt) {
+    createUserInDatabase("users", id, {
+      userName,
+      email,
+      password,
+      id,
+      createdAt,
+      profileUrl:
+        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+    });
   }
 
   return (
@@ -86,9 +127,22 @@ export default function Signup() {
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
               id="outlined-basic"
-              label="Email or Mobile No "
+              label="Username"
               variant="outlined"
               fullWidth={true}
+              margin={"dense"}
+              type="text"
+              value={userInput?.userName}
+              onChange={(e) => {
+                setUserInput({ ...userInput, userName: e.target.value });
+              }}
+            />
+            <TextField
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
+              fullWidth={true}
+              type="email"
               margin={"dense"}
               value={userInput?.email}
               onChange={(e) => {
@@ -126,6 +180,18 @@ export default function Signup() {
                 onClick={handleSignUpClick}
               >
                 Sign Up
+              </Button>
+            </div>
+            <Divider orientation="horizontal" style={{ marginTop: "1rem" }} />
+            <div className="goggle-btn-cont" style={{ margin: "1rem 0" }}>
+              <Button
+                variant="outlined"
+                margin={"dense"}
+                color="primary"
+                fullWidth={true}
+                onClick={handleSignUpWithGoggle}
+              >
+                Sign Up with Goggle
               </Button>
             </div>
             {isOk && <Alert severity="success">{isOk}</Alert>}

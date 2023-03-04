@@ -20,6 +20,7 @@ import {
   getFirestore,
   collection,
   addDoc,
+  setDoc,
   doc,
   getDoc,
   getDocs,
@@ -71,14 +72,15 @@ export const FirebaseContext = (props) => {
 
   // sign with google
   const signUpWithGoogle = () => {
-    signInWithPopup(firebaseAuth, googleProviderAuth);
+    return signInWithPopup(firebaseAuth, googleProviderAuth);
   };
 
-  //when user sign with google
-  const afterUserSignWithGoogle = (setUser) => {
+  //to check weather user is log in ot not
+  const afterUserLogin = (setUser) => {
     onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         // you are going
+        console.log(user);
         setUser(user);
       } else {
         console.log("you are logged out");
@@ -93,34 +95,33 @@ export const FirebaseContext = (props) => {
   };
 
   //Create Collection
-  const createUserInDatabase = async (userObj) => {
-    const response = await addDoc(collection(fireStore, "users"), userObj);
-    // console.log(response);
+  const createUserInDatabase = async (path, id, userObj) => {
+    // setDoc(doc(db, "users", id), userObj);
+    const response = await setDoc(doc(fireStore, path, id), userObj);
+    console.log("Firebase", response);
     return response;
   };
 
-  // makeSubCollection
-  const makeSubCollection = async () => {
-    const response = await addDoc(
-      collection(fireStore, "cities/C7HJBmt2pOcCwTgQ8x4V/areas"),
-      {
-        name: "BhagyaShree Nagar",
-        pinCode: 440009,
-        lat: 123,
-        long: 2569,
-      }
-    );
-    console.log(response);
+  // make document in user post collection
+  const makeSubCollection = async (path, id, inputObj) => {
+    try {
+      // setDoc(doc(fireStore, path, id), userObj);
+      const response = await setDoc(doc(fireStore, path, id), inputObj);
+      console.log("sub Collection", response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // read database with given collection id
-  const getDocument = async () => {
-    const ref = doc(fireStore, "cities", "C7HJBmt2pOcCwTgQ8x4V");
+  // read database with given Doc id
+  const getDocument = async (id) => {
+    const ref = doc(fireStore, "users", id);
     const response = await getDoc(ref);
     console.log(response.data());
+    return response.data();
   };
 
-  // read database without collection id
+  // read database with Doc id
   const getDataUsingEmail = async (email) => {
     const collectionRef = collection(fireStore, "users");
     const q = query(collectionRef, where("email", "==", email));
@@ -132,17 +133,31 @@ export const FirebaseContext = (props) => {
     return resultObj;
   };
 
+  // read database, all doc from collection
+  async function getAllPostData(path) {
+    let res = [];
+    const querySnapshot = await getDocs(collection(fireStore, path));
+    console.log(querySnapshot);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      // console.log(doc.id, " => ", doc.data());
+      res.push(doc.data());
+    });
+    return res;
+  }
+
   const value = {
     signUpUserWithEmailAndPassword,
     loginWithEmailAndPassword,
     putData,
     signUpWithGoogle,
-    afterUserSignWithGoogle,
+    afterUserLogin,
     singOutFun,
     createUserInDatabase,
     makeSubCollection,
     getDocument,
     getDataUsingEmail,
+    getAllPostData,
   };
   return (
     <div>

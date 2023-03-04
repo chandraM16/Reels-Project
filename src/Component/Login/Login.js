@@ -7,13 +7,15 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../Context/GlobalContext";
 import { useFirebase } from "../Context/FirebaseContext";
 import { Feed } from "../Feed/Feed";
+import { Divider } from "@mui/material";
 
 // import { makeStyles } from '@mui/styles';
 import "../Login/login.css";
+import { async } from "@firebase/util";
 
 export default function Login() {
   const [userInput, setUserInput] = useState({
@@ -22,8 +24,14 @@ export default function Login() {
   });
   const [isOk, setIsOk] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const { loginWithEmailAndPassword, getDataUsingEmail } = useFirebase();
+  const {
+    loginWithEmailAndPassword,
+    getDataUsingEmail,
+    signUpWithGoogle,
+    getDocument,
+  } = useFirebase();
   const { setUser, user } = useGlobalContext();
 
   // console.log(signUpUserWithEmailAndPassword);
@@ -37,8 +45,8 @@ export default function Login() {
       console.log(response);
       setIsOk(true);
       setError("");
-      const userDataObjFromDatabase = await getDataUsingEmail(userInput.email);
-      setUser(userDataObjFromDatabase[0]);
+      await getDataFromDataBase(response.user.uid);
+      navigate("/feed");
     } catch (error) {
       console.log(error);
       setIsOk(false);
@@ -50,9 +58,19 @@ export default function Login() {
     }
   }
 
-  if (isOk) {
-    return <Feed />;
+  async function handleLoginWithGoggle() {
+    const response = await signUpWithGoogle();
+    console.log(response);
+    await getDataFromDataBase(response.user.uid);
+    navigate("/feed");
   }
+
+  async function getDataFromDataBase(id) {
+    const userDataObjFromDatabase = await getDocument(id);
+    setUser(userDataObjFromDatabase);
+  }
+
+ 
   return (
     <div className="loginWrapper">
       <div className="loginCard">
@@ -103,6 +121,18 @@ export default function Login() {
                 onClick={handleLoginClick}
               >
                 Log In
+              </Button>
+            </div>
+            <Divider orientation="horizontal" style={{ marginTop: "1rem" }} />
+            <div className="goggle-btn-cont" style={{ margin: "1rem 0" }}>
+              <Button
+                variant="outlined"
+                margin={"dense"}
+                color="primary"
+                fullWidth={true}
+                onClick={handleLoginWithGoggle}
+              >
+                Login with Goggle
               </Button>
             </div>
           </CardContent>
