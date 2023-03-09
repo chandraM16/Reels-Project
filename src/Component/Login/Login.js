@@ -18,34 +18,51 @@ import "../Login/login.css";
 import { async } from "@firebase/util";
 
 export default function Login() {
+  //obj for user's input
   const [userInput, setUserInput] = useState({
     email: "",
     password: "",
   });
+
+  // state for to check whether everything is good or not
   const [isOk, setIsOk] = useState(false);
+
+  // state or any error
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const {
     loginWithEmailAndPassword,
-    getDataUsingEmail,
+
     signUpWithGoogle,
     getDocument,
+    getAllPostData,
   } = useFirebase();
-  const { setUser, user } = useGlobalContext();
+  const {
+    user,
+    setUser,
+    setAllPosts,
+    allPosts,
+    setCurrUserPosts,
+    currUserPosts,
+  } = useGlobalContext();
 
   // console.log(signUpUserWithEmailAndPassword);
 
   async function handleLoginClick() {
     try {
+      //login
       const response = await loginWithEmailAndPassword(
         userInput.email,
         userInput.password
       );
-      console.log(response);
       setIsOk(true);
       setError("");
+
+      //get the data of user from fireStore
       await getDataFromDataBase(response.user.uid);
+
+      //redirected to feed section
       navigate("/feed");
     } catch (error) {
       console.log(error);
@@ -59,18 +76,36 @@ export default function Login() {
   }
 
   async function handleLoginWithGoggle() {
+    // login with google
     const response = await signUpWithGoogle();
-    console.log(response);
+    //get the data of user from fireStore
     await getDataFromDataBase(response.user.uid);
+
+    //redirected to feed section
     navigate("/feed");
   }
 
+  // get a data of user with given 'id' in 'users' collection of fireStore
   async function getDataFromDataBase(id) {
     const userDataObjFromDatabase = await getDocument(id);
+
+    // set this user data in curr user State
     setUser(userDataObjFromDatabase);
+    console.log("we got the data of the user from fireStore");
+
+    // whenever user login, we fetch the data form 'post' collection of fireStore and store in current state 'allPosts' and at the end sort those allPosts array on basis of created property of each object, so that latest post come first.
+
+    const arrOfPostObj = await getAllPostData("posts");
+    setAllPosts(arrOfPostObj.sort((a, b) => b.createdAt - a.createdAt));
+    console.log("allPost data is fetched");
+
+    const allPostOFCurrUser = await getAllPostData(`users/${id}/posts/`);
+    setCurrUserPosts(
+      allPostOFCurrUser.sort((a, b) => b.createdAt - a.createdAt)
+    );
+    console.log("allPost data of user  is fetched");
   }
 
- 
   return (
     <div className="loginWrapper">
       <div className="loginCard">

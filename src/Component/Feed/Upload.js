@@ -15,75 +15,83 @@ import {
   uploadBytes,
   listAll,
   getDownloadURL,
-  uploadFileInStorage,
 } from "firebase/storage";
 import { get } from "firebase/database";
 
 const storage = getStorage(app);
+//function for upload any file in storage
+async function uploadFileInStorage(file, path) {
+  if (file == null) {
+    return;
+  }
+  const fileRef = ref(storage, path);
+  const response = await uploadBytes(fileRef, file);
+  return response;
+}
+async function getUrlOfPost(path) {
+  //create the ref of file form path of the file
+  const refOfAllFiles = ref(storage, path);
+  const response = await listAll(refOfAllFiles);
+  return response.items.map(async (file) => {
+    return await getDownloadURL(file);
+  });
+}
 
 export default function UploadButtons() {
-  const { user, setUser } = useGlobalContext();
-  const { makeSubCollection, getDocument, createUserInDatabase } =
-    useFirebase();
+  const {
+    user,
+    setUser,
+    setAllPosts,
+    allPosts,
+    currUserPosts,
+    setCurrUserPosts,
+  } = useGlobalContext();
+
+  const { createObjInDatabase, getAllPostData } = useFirebase();
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  //function for upload any file in storage
-  async function uploadFileInStorage(file, path) {
-    if (file == null) {
-      return;
-    }
-    const fileRef = ref(storage, path);
-    const response = await uploadBytes(fileRef, file);
-    console.log("file upload", response);
-    return response;
-  }
-
-  async function getUrlOfPost(path) {
-    //create the ref of file form path of the file
-    const refOfAllFiles = ref(storage, path);
-    const response = await listAll(refOfAllFiles);
-    return response.items.map(async (file) => {
-      return await getDownloadURL(file);
-    });
-  }
-
   // when user upload the file
   async function handleFileUploadChange(file) {
+    //if file is not present
     if (!file) {
       // Error handling
       setError("Please select a file first");
       setTimeout(() => {
         setError("");
       }, 2000);
-    } else if (file.size / (1024 * 1024) > 100) {
+    }
+    // if size of file is more than 100 mb then throw error
+    else if (file.size / (1024 * 1024) > 100) {
       // Error handling
       setError("This video is very big");
       setTimeout(() => {
         setError("");
       }, 2000);
-    } else {
+    }
+
+    // every thing is ok
+    else {
       try {
         // generate the uid for post
         const fileId = uuidv4();
 
-        // upload in storage with actual file , file, name user id and file id
-        // userId -> posts -> postId (file id) -> fileName
+        // process of uploading in Storage in start
         setIsLoading(true);
-        await uploadFileInStorage(
-          file,
-          `${user.id}/posts/${fileId}/${file.name}`
-        );
 
-        // upload in post folder
-        await uploadFileInStorage(file, `posts/${fileId}/${file.name}`);
+        // upload in post folder in Storage
+        await uploadFileInStorage(file, `posts/${fileId}/${file?.name}`);
 
         // get url of post from storage
-        let response = await getUrlOfPost(`${user.id}/posts/${fileId}`);
+        let response = await getUrlOfPost(`posts/${fileId}`);
         let url = await response[0];
-        console.log(url);
+        console.log(
+          "Post is Saved in Storage and Url of Post is generated",
+          url
+        );
 
-        // dataBase update
+        // create the obj about post
         const postInfoObj = {
           likes: [],
           comments: [],
@@ -92,16 +100,29 @@ export default function UploadButtons() {
           PostName: file.name,
           userId: user.id,
           userName: user.userName,
+          userProfile : user.profileUrl,
           createdAt: Date.now(),
         };
-        makeSubCollection(`users/${user.id}/posts`, fileId, postInfoObj);
-        createUserInDatabase("posts", fileId, postInfoObj);
+
+        // updated AllPost array with new Post
+
+        createObjInDatabase("posts", fileId, postInfoObj);
+        createObjInDatabase(`users/${user.id}/posts`, fileId, postInfoObj);
+        console.log("done");
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
       } finally {
-        const updatedUserData = await getDocument(user.id);
-        setUser(updatedUserData);
-        setIsLoading(false);
+        const arrOfAllPostObj = await getAllPostData("posts");
+        arrOfAllPostObj.sort((a, b) => b.createdAt - a.createdAt);
+        setAllPosts(arrOfAllPostObj);
+        console.log("post is saved in curr allPost Array");
+
+        const arrOfCurrPostObj = await getAllPostData(`users/${user.id}/posts`);
+        arrOfCurrPostObj.sort((a, b) => b.createdAt - a.createdAt);
+        setCurrUserPosts(arrOfCurrPostObj);
+        console.log();
+        console.log("post is saved in CurrUserObj");
       }
     }
   }
@@ -126,7 +147,6 @@ export default function UploadButtons() {
                 multiple
                 type="file"
                 onChange={(e) => {
-                  console.log("hi");
                   handleFileUploadChange(e.target.files[0]);
                 }}
               />
@@ -138,3 +158,5 @@ export default function UploadButtons() {
     </div>
   );
 }
+
+export { getUrlOfPost, uploadFileInStorage };

@@ -1,0 +1,23 @@
+.postbox {
+  border: 2px solid #d2d2d2;
+  width: 100%;
+  margin: 1rem;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+.post-cont {
+  /* border: 3px solid darkred; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem;
+}
+.post {
+  /* border: 3px solid darkgoldenrod; */
+  width: 169px;
+  height: 300px;
+  border-radius: 0.8rem;
+}

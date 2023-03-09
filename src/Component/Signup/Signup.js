@@ -17,26 +17,34 @@ import { useFirebase } from "../Context/FirebaseContext";
 import { async } from "@firebase/util";
 
 export default function Signup() {
+
+  //obj for user's input 
   const [userInput, setUserInput] = useState({
     userName: "",
     email: "",
     password: "",
     cPassword: "",
   });
+
+  // state for to check whether everything is good or not
   const [isOk, setIsOk] = useState("");
+
+  // state or any error
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const {
     signUpUserWithEmailAndPassword,
-    createUserInDatabase,
+    createObjInDatabase,
     signUpWithGoogle,
   } = useFirebase();
-  // console.log(signUpUserWithEmailAndPassword);
+  
 
   async function handleSignUpClick() {
+
+    // if passwords are not matching
     if (userInput.password != userInput.cPassword) {
-      setError("Passwords are Not Match");
+      setError("Passwords Are Not Match");
       setTimeout(() => {
         setError("");
       }, 2000);
@@ -45,16 +53,19 @@ export default function Signup() {
     }
 
     try {
+      //create the user in firebase-auth
       const response = await signUpUserWithEmailAndPassword(
         userInput.email,
         userInput.password
       );
       console.log(response);
       const userObj = response.user;
-      console.log(userObj);
-
+     
+      console.log("user is created in firebase-auth")
       setIsOk("Successfully Sign Up");
       setError("");
+      
+      // create the user's obj in fireStore database
       putDataInDataBase(
         userInput.userName,
         userObj.email,
@@ -62,6 +73,8 @@ export default function Signup() {
         userInput.password,
         userObj.metadata.createdAt
       );
+
+      console.log("user's obj is created in firestore database")
       setTimeout(() => {
         navigate("/");
       }, 3000);
@@ -75,10 +88,11 @@ export default function Signup() {
     } finally {
     }
   }
-
+  
   async function handleSignUpWithGoggle() {
     const response = await signUpWithGoogle();
     console.log(response);
+    console.log("user is created in firebase-auth with google sign up")
     setIsOk("Successfully Sign Up");
     setError("");
     putDataInDataBase(
@@ -87,7 +101,8 @@ export default function Signup() {
       response.user.uid,
       "googleSignIn",
       response.user.metadata.createdAt
-    );
+      );
+      console.log("user's obj is created in firestore database with google sign up")
 
     setTimeout(() => {
       navigate("/");
@@ -95,7 +110,7 @@ export default function Signup() {
   }
 
   function putDataInDataBase(userName, email, id, password, createdAt) {
-    createUserInDatabase("users", id, {
+    createObjInDatabase("users", id, {
       userName,
       email,
       password,

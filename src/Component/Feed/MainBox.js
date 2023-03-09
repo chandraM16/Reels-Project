@@ -1,43 +1,28 @@
-import React from "react";
+import React, {useEffect} from "react";
 import "../Feed/feed.css";
 import { PostContent } from "./PostContent";
+import { Like } from "./Like";
+import { Comment } from "./Comment";
+import { CircularProgress } from "@mui/material";
+import { useFirebase } from "../Context/FirebaseContext";
+
 
 export const MainBox = (prop) => {
-  const { postObj } = prop;
+  const { postObj, userId } = prop;
+  console.log(postObj)
+  const { updateTheCompleteDoc } = useFirebase();
+
+  
   return (
     <div className=" main-box">
-      <div className="vid-cont">
-        <PostContent src={postObj.postUrl} />{" "}
-      </div>
+      <div className="vid-cont">{<PostContent src={postObj.postUrl} />}</div>
       <div className="post-info-cont">
         <div className="user-name-cont">
-          <img src={postObj.profileUrl} alt="" className="profile-pic" />
+          <img src={postObj.userProfile} alt="" className="profile-pic" />
           <h2>{postObj.userName}</h2>
         </div>
-        <div className="post-likes-cont">
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "35px" }}
-          >
-            favorite
-          </span>
-          <h4 className="post-like">{postObj.likes.length} </h4>
-        </div>
-        <div className="post-comments-cont">
-          <h4>Comments :-</h4>
-          <div className="post-comment">
-            {postObj.comments.map((comment) => {
-              return <p>{comment}</p>;
-            })}
-          </div>
-          <div className="comment-input-cont">
-            <input
-              type="text"
-              className="comment-input"
-              placeholder="Say Something"
-            />
-          </div>
-        </div>
+        <Like postObj={postObj} userId={userId} />
+        <Comment postObj={postObj} />
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ import {
   getDocs,
   query,
   where,
+  updateDoc,
 } from "firebase/firestore";
 import { getDatabase, ref, set } from "firebase/database";
 import { async } from "@firebase/util";
@@ -95,7 +96,7 @@ export const FirebaseContext = (props) => {
   };
 
   //Create Collection
-  const createUserInDatabase = async (path, id, userObj) => {
+  const createObjInDatabase = async (path, id, userObj) => {
     // setDoc(doc(db, "users", id), userObj);
     const response = await setDoc(doc(fireStore, path, id), userObj);
     console.log("Firebase", response);
@@ -103,11 +104,11 @@ export const FirebaseContext = (props) => {
   };
 
   // make document in user post collection
-  const makeSubCollection = async (path, id, inputObj) => {
+  const makeDocAtPath = async (path, id, inputObj) => {
     try {
       // setDoc(doc(fireStore, path, id), userObj);
       const response = await setDoc(doc(fireStore, path, id), inputObj);
-      console.log("sub Collection", response);
+
     } catch (error) {
       console.log(error);
     }
@@ -121,7 +122,7 @@ export const FirebaseContext = (props) => {
     return response.data();
   };
 
-  // read database with Doc id
+  // read database without Doc id or given particular condition
   const getDataUsingEmail = async (email) => {
     const collectionRef = collection(fireStore, "users");
     const q = query(collectionRef, where("email", "==", email));
@@ -137,14 +138,18 @@ export const FirebaseContext = (props) => {
   async function getAllPostData(path) {
     let res = [];
     const querySnapshot = await getDocs(collection(fireStore, path));
-    console.log(querySnapshot);
     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
       res.push(doc.data());
     });
     return res;
   }
+
+  // update the data
+  const updateTheCompleteDoc = async (path, postId, updatedObj) => {
+    const washingtonRef = doc(fireStore, path, postId);
+    // Set the "capital" field of the city 'DC'
+    await updateDoc(washingtonRef, updatedObj);
+  };
 
   const value = {
     signUpUserWithEmailAndPassword,
@@ -153,11 +158,12 @@ export const FirebaseContext = (props) => {
     signUpWithGoogle,
     afterUserLogin,
     singOutFun,
-    createUserInDatabase,
-    makeSubCollection,
+    createObjInDatabase,
+    makeDocAtPath,
     getDocument,
     getDataUsingEmail,
     getAllPostData,
+    updateTheCompleteDoc,
   };
   return (
     <div>
