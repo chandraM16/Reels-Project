@@ -38,14 +38,8 @@ export default function Login() {
     getDocument,
     getAllPostData,
   } = useFirebase();
-  const {
-    user,
-    setUser,
-    setAllPosts,
-    allPosts,
-    setCurrUserPosts,
-    currUserPosts,
-  } = useGlobalContext();
+
+  const { user, setUser } = useGlobalContext();
 
   // console.log(signUpUserWithEmailAndPassword);
 
@@ -88,22 +82,9 @@ export default function Login() {
   // get a data of user with given 'id' in 'users' collection of fireStore
   async function getDataFromDataBase(id) {
     const userDataObjFromDatabase = await getDocument(id);
-
     // set this user data in curr user State
     setUser(userDataObjFromDatabase);
     console.log("we got the data of the user from fireStore");
-
-    // whenever user login, we fetch the data form 'post' collection of fireStore and store in current state 'allPosts' and at the end sort those allPosts array on basis of created property of each object, so that latest post come first.
-
-    const arrOfPostObj = await getAllPostData("posts");
-    setAllPosts(arrOfPostObj.sort((a, b) => b.createdAt - a.createdAt));
-    console.log("allPost data is fetched");
-
-    const allPostOFCurrUser = await getAllPostData(`users/${id}/posts/`);
-    setCurrUserPosts(
-      allPostOFCurrUser.sort((a, b) => b.createdAt - a.createdAt)
-    );
-    console.log("allPost data of user  is fetched");
   }
 
   return (

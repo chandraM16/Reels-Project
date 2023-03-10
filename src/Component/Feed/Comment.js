@@ -1,20 +1,44 @@
+import { async } from "@firebase/util";
 import React, { useEffect, useState } from "react";
 import { useGlobalContext } from "../Context/GlobalContext";
+import { useFirebase } from "../Context/FirebaseContext";
 export const Comment = (prop) => {
   const { postObj } = prop;
   const { user } = useGlobalContext();
+  const { updateTheCompleteDoc } = useFirebase();
   const [localComment, setLocalComment] = useState("");
   // console.log(postObj);
-  function handleSetLocalCommentInPostObj() {
-    postObj.comments.unshift({
-      name: user.userName,
-      commentText: localComment,
+  async function handleSetLocalCommentInPostObj() {
+    console.log(11);
+    const newCommentsArr = [
+      {
+        name: user.userName,
+        commentText: localComment,
+      },
+      ...postObj.comments,
+    ];
+    
+    postObj.comments = [
+      {
+        name: user.userName,
+        commentText: localComment,
+      },
+      ...postObj.comments,
+    ];
+
+     updateTheCompleteDoc("posts", postObj.postID, {
+      comments: newCommentsArr,
     });
+     updateTheCompleteDoc(
+      `users/${postObj.userId}/posts`,
+      postObj.postID,
+      {
+        comments: newCommentsArr,
+      }
+    );
     setLocalComment("");
   }
-  // useEffect(() => {
-  //   setLocalComment(postObj.comments.sort((a, b) => b.createdAt - a.createdAt));
-  // }, []);
+
   return (
     <div className="post-comments-cont">
       <h4>Comments :-</h4>

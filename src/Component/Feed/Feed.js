@@ -25,19 +25,7 @@ export const Feed = () => {
 
   //function for logout
   async function handleLogOutClick() {
-    // put all post obj in proper place in fire Store
-
-    await allPosts.forEach((obj) => {
-      console.log(obj);
-      // place obj in "posts" collection
-      updateTheCompleteDoc("posts", obj.postID, obj);
-
-      // place obj in "users" collection
-      updateTheCompleteDoc(`users/${obj.userId}/posts`, obj.postID, obj);
-
-      // place updated user obj in fireStor
-      updateTheCompleteDoc("users/", user.id, user);
-    });
+    updateTheCompleteDoc("users/", user.id, user);
     setAllPosts(null);
     setCurrUserPosts(null);
     setUser(null);
@@ -52,9 +40,25 @@ export const Feed = () => {
 
   // whenever user login, we fetch the data form 'post' collection of fireStore and store in current state 'allPosts' and at the end sort those allPosts array on basis of created property of each object, so that latest post come first.
   useEffect(() => {
-    console.log(allPosts);
-    console.log(currUserPosts);
-  }, [allPosts, currUserPosts]);
+    console.log(user);
+    // console.log(currUserPosts);
+  }, [user]);
+
+  useEffect(() => {
+    (async function () {
+      // whenever user login, we fetch the data form 'post' collection of fireStore and store in current state 'allPosts' and at the end sort those allPosts array on basis of created property of each object, so that latest post come first.
+
+      const arrOfPostObj = await getAllPostData("posts");
+      setAllPosts(arrOfPostObj.sort((a, b) => b.createdAt - a.createdAt));
+      console.log("allPost data is fetched");
+
+      const allPostOFCurrUser = await getAllPostData(`users/${user.id}/posts/`);
+      setCurrUserPosts(
+        allPostOFCurrUser.sort((a, b) => b.createdAt - a.createdAt)
+      );
+      console.log("allPost data of user  is fetched");
+    })();
+  },[]);
 
   return (
     <div className="feed">

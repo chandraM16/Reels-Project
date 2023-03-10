@@ -19,7 +19,7 @@ export const UserBox = (prop) => {
         <div className="user-emailAndTime-cont">
           <div className="user-emailAndTime">
             <p>{user.email}</p>
-            <p>{new Date(+user.createdAt).toLocaleDateString()}</p>
+            <p>Join At:  {new Date(+user.createdAt).toLocaleDateString()}</p>
           </div>
           <div className="user-setting">
             <MyModal />

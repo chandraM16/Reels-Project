@@ -20,6 +20,7 @@ export const MainBox = (prop) => {
         <div className="user-name-cont">
           <img src={postObj.userProfile} alt="" className="profile-pic" />
           <h2>{postObj.userName}</h2>
+          
         </div>
         <Like postObj={postObj} userId={userId} />
         <Comment postObj={postObj} />

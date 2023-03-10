@@ -9,6 +9,8 @@ import { useGlobalContext } from "../../Context/GlobalContext";
 import Alert from "@mui/material/Alert";
 import { uuidv4 } from "@firebase/util";
 import { uploadFileInStorage, getUrlOfPost } from "../Upload";
+import { useFirebase } from "../../Context/FirebaseContext";
+import { getDataFromDataBase } from "../../Login/Login";
 
 const style = {
   position: "absolute",
@@ -22,10 +24,10 @@ const style = {
   pt: 2,
   px: 4,
   pb: 3,
-  
 };
 
 function ChildModal() {
+  const { updateTheCompleteDoc, getDocument } = useFirebase();
   const { user, setUser } = useGlobalContext();
   const [userInput, setUserInput] = useState({
     oldPawd: "",
@@ -43,7 +45,7 @@ function ChildModal() {
     setOpen(false);
   };
 
-  function handlePasswordSubmit() {
+  async function handlePasswordSubmit() {
     if (userInput.newPawd != userInput.confPawd) {
       setError("New Password and Confirm Password are not matched.");
       setIsOk(false);
@@ -53,7 +55,11 @@ function ChildModal() {
       setIsOk(false);
       return;
     } else {
-      setUser({ ...user, password: userInput.newPawd });
+      await updateTheCompleteDoc("users/", user.id, {
+        password: userInput.newPawd,
+      });
+      const updatedUser = await getDocument(user.id);
+      setUser(updatedUser);
       setError("");
       setIsOk(true);
       setTimeout(handleClose, 2000);
@@ -61,8 +67,8 @@ function ChildModal() {
   }
 
   useEffect(() => {
-    console.log(userInput);
-  }, [userInput]);
+    console.log(user);
+  }, [user]);
 
   return (
     <React.Fragment>
@@ -73,7 +79,7 @@ function ChildModal() {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box sx={{ ...style, width: 350, borderRadius : "0.6rem" }}>
+        <Box sx={{ ...style, width: 350, borderRadius: "0.6rem" }}>
           <h2 style={{ marginBottom: "1rem" }}>Change Password:</h2>
           {error != "" && <Alert severity="error">{error}</Alert>}
           {isOk && <Alert severity="success">Password Updated!</Alert>}
@@ -130,6 +136,7 @@ function ChildModal() {
 }
 
 export default function MyModal() {
+  const { updateTheCompleteDoc, getDocument } = useFirebase();
   const { user, setUser } = useGlobalContext();
   const [userInput, setUserInput] = useState({
     userName: user.userName,
@@ -151,6 +158,14 @@ export default function MyModal() {
   };
 
   async function handleInfoUpdateSubmit() {
+    if (userInput.contactNo.length != 10) {
+      setIsOk(false);
+      setError("Contact No. Is Invalid");
+      setTimeout(() => {
+        setError("");
+      }, 2000);
+      return;
+    }
     try {
       if (fileObj) {
         console.log(123);
@@ -170,11 +185,17 @@ export default function MyModal() {
         let response = await getUrlOfPost(`allPhoto/${fileId}`);
         let url = await response[0];
         setUser({ ...user, profileUrl: url });
+        updateTheCompleteDoc("users/", user.id, { profileUrl: url });
         setIsLoading(false);
       }
-      setUser({ ...user, ...userInput });
+
+      await updateTheCompleteDoc("users/", user.id, userInput);
+      const updatedUser = await getDocument(user.id);
+      setUser(updatedUser);
+
       setIsOk(true);
       setError("");
+
       setTimeout(() => {
         handleClose();
         setIsOk(false);
@@ -185,10 +206,15 @@ export default function MyModal() {
       setIsOk(false);
     }
   }
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
   return (
     <div>
       <Button onClick={handleOpen}>
-        <ManageAccountsIcon fontSize="large" style={{color: "black"}} />
+        <ManageAccountsIcon fontSize="large" style={{ color: "black" }} />
       </Button>
       <Modal
         open={open}
@@ -196,7 +222,7 @@ export default function MyModal() {
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
       >
-        <Box sx={{ ...style, width: "40rem", borderRadius : "0.4rem" }}>
+        <Box sx={{ ...style, width: "40rem", borderRadius: "0.4rem" }}>
           <div className="updated-box">
             <h2 style={{ marginBottom: "1rem" }}>Chandan</h2>
             {error != "" && <Alert severity="error">{error}</Alert>}
@@ -246,7 +272,8 @@ export default function MyModal() {
             />
 
             <h5>Profile Photo:-</h5>
-            <Button variant="contained" component="label">
+            {fileObj && <p>{fileObj.name}</p>}
+            <Button variant="outlined" component="label">
               Upload
               <input
                 hidden
