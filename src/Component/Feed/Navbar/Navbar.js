@@ -16,8 +16,11 @@ function Navbar(prop) {
             navigate("/feed");
           }}
         >
-          <img src="https://www.seekpng.com/png/detail/72-723182_aai-instagram-button-instagram-logo-word-png.png" alt="Aai Instagram Button - Instagram Logo Word Png@seekpng.com" className="logo"></img>
-          
+          <img
+            src="https://www.seekpng.com/png/detail/72-723182_aai-instagram-button-instagram-logo-word-png.png"
+            alt="Aai Instagram Button - Instagram Logo Word Png@seekpng.com"
+            className="logo"
+          ></img>
         </div>
         <div className="upload-cont">
           <UploadButtons />

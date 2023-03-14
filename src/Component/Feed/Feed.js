@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useFirebase } from "../Context/FirebaseContext";
 import { useGlobalContext } from "../Context/GlobalContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Route, Routes } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import { MainBox } from "./MainBox";
 import Navbar from "./Navbar/Navbar";
+import { Home } from "./Home";
 import Login from "../Login/Login";
 import UploadButtons from "./Upload";
+import { UserProfile } from "../../Component/Feed/UserProfile/UserProfile";
 import "../Feed/feed.css";
+// import { Home } from "./Home";
 
 export const Feed = () => {
   const { singOutFun, getAllPostData, makeDocAtPath, updateTheCompleteDoc } =
@@ -58,24 +61,20 @@ export const Feed = () => {
       );
       console.log("allPost data of user  is fetched");
     })();
-  },[]);
+  }, []);
 
   return (
     <div className="feed">
       <div className="container">
         <Navbar handleLogOutClick={handleLogOutClick} user={user} />
-        {allPosts == null ? (
-          <CircularProgress />
-        ) : (
-          <div className="outer-shell">
-            {allPosts.map((obj) => {
-              return (
-                <MainBox postObj={obj} userId={user.id} key={obj.postID} />
-              );
-            })}
-          </div>
-        )}
       </div>
+      {allPosts == null ? (
+        <CircularProgress />
+      ) : (
+        <div className="container">
+          <Home allPosts={allPosts} />
+        </div>
+      )}
     </div>
   );
 };
