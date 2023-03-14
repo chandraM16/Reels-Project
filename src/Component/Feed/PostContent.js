@@ -1,5 +1,4 @@
 import React from "react";
-import { ReactDOM } from "react";
 import { useGlobalContext } from "../Context/GlobalContext";
 import { CircularProgress } from "@mui/material";
 
@@ -9,15 +8,7 @@ export const PostContent = (prop) => {
     e.preventDefault();
     e.target.muted = !e.target.muted;
   }
-
-  function handleScroll(e) {
-    let nextNode = ReactDOM.findDOMNode(e.target).parentNode.parentNode
-      .nextSibling;
-    if (nextNode) {
-      nextNode.scrollIntoView();
-      e.target.muted = true;
-    }
-  }
+ 
   return (
     <>
       {allPosts == null ? (
