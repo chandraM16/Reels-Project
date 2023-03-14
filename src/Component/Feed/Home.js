@@ -6,7 +6,7 @@ export const Home = ({ allPosts }) => {
   const { user } = useGlobalContext();
   return (
     <>
-      <div className="outer-shell">
+      <div id="shell" className="outer-shell">
         {allPosts.map((obj) => {
           return <MainBox postObj={obj} userId={user.id} key={obj.postID} />;
         })}

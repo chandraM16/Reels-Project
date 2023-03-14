@@ -17,27 +17,93 @@
   display: flex;
   width: 25rem;
   justify-content: space-between;
-  padding:0.5rem;
+  padding: 0.5rem;
   align-items: center;
 }
 
-.logo{
-    width: 15rem;
-    height: 4rem;
-    cursor: pointer;
-    margin-right: 0.5rem;
-    /* background-color: #eaeaea; */
+.logo {
+  width: 15rem;
+  height: 4rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  /* background-color: #eaeaea; */
+}
+
+.small-logo {
+  width: 4rem;
+  height: 4rem;
+  display: none;
 }
 
 .right-content {
   /* border: 3px solid red; */
-  width: 12rem;
+  width: 16rem;
   display: flex;
   justify-content: space-between;
   padding: 0 1rem;
   align-items: center;
 }
 
-.avatar-cont, .logout-cont{
-    cursor: pointer;
+.avatar-cont,
+.logout-cont {
+  cursor: pointer;
+}
+
+/* Media Query for Mobile Devices */
+@media (max-width: 480px) {
+  .container {
+    width: 100vw;
+  }
+  .navbar {
+    padding: 0;
+  }
+  .left-content {
+    width: auto;
+    /* border: 3px solid black; */
+  }
+  .upload-cont {
+    width: 8rem;
+    /* border: 3px solid black; */
+  }
+  .css-1l9sosn-MuiButtonBase-root-MuiButton-root {
+    width: 5rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+  .logo {
+    display: none;
+  }
+  .small-logo {
+    display: block;
+  }
+
+  .right-content{
+    width: 6rem;
+  }
+
+  .right-content h4 {
+    display: none;
+  }
+}
+
+/* Media Query for low resolution  Tablets, Ipads */
+@media (min-width: 481px) and (max-width: 767px) {
+  .container {
+    width: 93%;
+  }
+}
+
+/* Media Query for Tablets Ipads portrait mode */
+@media (min-width: 768px) and (max-width: 1024px) {
+ 
+}
+
+/* Media Query for Laptops and Desktops */
+@media (min-width: 1025px) and (max-width: 1280px) {
+ 
+}
+
+/* Media Query for Large screens */
+@media (min-width: 1281px) {
+ 
 }

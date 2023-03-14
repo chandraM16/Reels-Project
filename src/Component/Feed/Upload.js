@@ -139,6 +139,7 @@ export default function UploadButtons() {
               variant="outlined"
               component="label"
               disabled={isLoading}
+              style ={{fontSize : "1rem"}}
             >
               Upload Video
               <input

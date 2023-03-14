@@ -17,8 +17,7 @@ import { useFirebase } from "../Context/FirebaseContext";
 import { async } from "@firebase/util";
 
 export default function Signup() {
-
-  //obj for user's input 
+  //obj for user's input
   const [userInput, setUserInput] = useState({
     userName: "",
     email: "",
@@ -38,10 +37,8 @@ export default function Signup() {
     createObjInDatabase,
     signUpWithGoogle,
   } = useFirebase();
-  
 
   async function handleSignUpClick() {
-
     // if passwords are not matching
     if (userInput.password != userInput.cPassword) {
       setError("Passwords Are Not Match");
@@ -60,11 +57,11 @@ export default function Signup() {
       );
       console.log(response);
       const userObj = response.user;
-     
-      console.log("user is created in firebase-auth")
+
+      console.log("user is created in firebase-auth");
       setIsOk("Successfully Sign Up");
       setError("");
-      
+
       // create the user's obj in fireStore database
       putDataInDataBase(
         userInput.userName,
@@ -74,7 +71,7 @@ export default function Signup() {
         userObj.metadata.createdAt
       );
 
-      console.log("user's obj is created in firestore database")
+      console.log("user's obj is created in firestore database");
       setTimeout(() => {
         navigate("/");
       }, 3000);
@@ -88,11 +85,11 @@ export default function Signup() {
     } finally {
     }
   }
-  
+
   async function handleSignUpWithGoggle() {
     const response = await signUpWithGoogle();
     console.log(response);
-    console.log("user is created in firebase-auth with google sign up")
+    console.log("user is created in firebase-auth with google sign up");
     setIsOk("Successfully Sign Up");
     setError("");
     putDataInDataBase(
@@ -101,8 +98,10 @@ export default function Signup() {
       response.user.uid,
       "googleSignIn",
       response.user.metadata.createdAt
-      );
-      console.log("user's obj is created in firestore database with google sign up")
+    );
+    console.log(
+      "user's obj is created in firestore database with google sign up"
+    );
 
     setTimeout(() => {
       navigate("/");
@@ -140,6 +139,7 @@ export default function Signup() {
               Sign up to see photos and videos from your friends
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
+            {isOk && <Alert severity="success">{isOk}</Alert>}
             <TextField
               id="outlined-basic"
               label="Username"
@@ -209,7 +209,7 @@ export default function Signup() {
                 Sign Up with Goggle
               </Button>
             </div>
-            {isOk && <Alert severity="success">{isOk}</Alert>}
+
             <Typography
               className="subtitle"
               variant="subtitle1"

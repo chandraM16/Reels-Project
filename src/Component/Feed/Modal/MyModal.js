@@ -199,7 +199,7 @@ export default function MyModal() {
       setTimeout(() => {
         handleClose();
         setIsOk(false);
-      }, 2000);
+      }, 1000);
     } catch (err) {
       console.log(err);
       setError("Something Went Wrong");

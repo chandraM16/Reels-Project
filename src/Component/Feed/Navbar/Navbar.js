@@ -21,6 +21,11 @@ function Navbar(prop) {
             alt="Aai Instagram Button - Instagram Logo Word Png@seekpng.com"
             className="logo"
           ></img>
+          <img
+            src="https://cdn.icon-icons.com/icons2/2714/PNG/512/instagram_logo_thin_icon_171701.png"
+            alt="Aai Instagram Button - Instagram Logo Word Png@seekpng.com"
+            className="small-logo"
+          ></img>
         </div>
         <div className="upload-cont">
           <UploadButtons />

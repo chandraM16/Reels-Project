@@ -195,3 +195,79 @@
   cursor: pointer;
   color: red;
 }
+
+/* Media Query for Mobile Devices */
+@media (max-width: 480px) {
+  .outer-shell {
+    width: 25rem;
+  }
+  .main-box {
+    height: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* border: 3px solid black; */
+    position: relative;
+  }
+  .vid-cont {
+    width: 90%;
+    /* border: 3px solid red; */
+    margin-top: 5rem;
+    padding: 0;
+  }
+  .video {
+    width: 17rem;
+    height: 30rem;
+  }
+  .post-info-cont {
+    width: 90%;
+    height: auto;
+    padding: 0;
+  }
+  .profile-pic {
+    width: 3rem;
+    height: 3rem;
+  }
+  .user-name-cont {
+    height: 3rem;
+    margin: 0;
+    position: absolute;
+    top: 1rem;
+    left: 2rem;
+  }
+  .post-likes-cont {
+    padding: 0 1rem;
+  }
+  .post-comments-cont {
+    height: 10rem;
+  }
+  .post-comments-cont h4 {
+    padding: 0 1rem;
+  }
+  .comment-input-cont {
+    margin: 0.5rem 0;
+  }
+}
+
+/* Media Query for low resolution  Tablets, Ipads */
+@media (min-width: 481px) and (max-width: 767px) {
+  .outer-shell {
+    width: 44rem;
+  }
+}
+
+/* Media Query for Tablets Ipads portrait mode */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    width: 90%;
+  }
+}
+
+/* Media Query for Laptops and Desktops */
+@media (min-width: 1025px) and (max-width: 1280px) {
+}
+
+/* Media Query for Large screens */
+@media (min-width: 1281px) {
+}
